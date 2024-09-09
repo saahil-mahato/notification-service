@@ -37,6 +37,6 @@ func NotificationHandler(notificationQueue *queue.NotificationQueue) fiber.Handl
 			RetryDelay:   retryDelay,
 		})
 
-		return c.SendString("Notification sent successfully")
+		return c.SendString("Notification queued. Will process it shortly.")
 	}
 }
