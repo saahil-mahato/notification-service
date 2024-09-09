@@ -1,12 +1,12 @@
 package main
 
 import (
-	"log"
 	"notification-service/handlers"
 	"notification-service/queue"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/sirupsen/logrus"
 )
 
 func main() {
@@ -21,5 +21,5 @@ func main() {
 	// Start the worker in a separate goroutine
 	go notificationQueue.StartWorker()
 
-	log.Fatal(app.Listen(":8080"))
+	logrus.Fatal(app.Listen(":8080"))
 }
