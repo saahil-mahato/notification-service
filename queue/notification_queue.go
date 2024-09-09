@@ -1,10 +1,11 @@
 package queue
 
 import (
-	"fmt"
 	"notification-service/services"
 	"sync"
 	"time"
+
+	"github.com/sirupsen/logrus"
 )
 
 // NotificationQueue holds the queue of notification tasks.
@@ -76,16 +77,16 @@ func (q *NotificationQueue) processTaskWithRetry(task NotificationTask) {
 	for {
 		err := task.Notification.Send(task.Recipient, task.Message)
 		if err != nil {
-			fmt.Printf("Error sending notification: %v\n", err)
+			logrus.Errorf("Error sending notification: %v\n", err)
 			task.RetryCount++
 			if task.RetryCount > task.MaxRetries {
-				fmt.Printf("Max retries reached for recipient %s. Giving up.\n", task.Recipient)
+				logrus.Fatalf("Max retries reached for recipient %s. Giving up.\n", task.Recipient)
 				return
 			}
-			fmt.Printf("Retrying... (%d/%d)\n", task.RetryCount, task.MaxRetries)
+			logrus.Infof("Retrying... (%d/%d)\n", task.RetryCount, task.MaxRetries)
 			time.Sleep(task.RetryDelay)
 		} else {
-			fmt.Printf("Notification sent successfully to %s\n", task.Recipient)
+			logrus.Infof("Notification sent successfully to %s\n", task.Recipient)
 			return
 		}
 	}
