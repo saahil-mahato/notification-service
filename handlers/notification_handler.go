@@ -7,14 +7,25 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/sirupsen/logrus"
 )
+
+// NotificationPayload is the payload structure of the API.
+type NotificationPayload struct {
+	Recipient string `json:"recipient"`
+	Message   string `json:"message"`
+}
 
 // NotificationHandler handles the HTTP request to send a notification.
 func NotificationHandler(notificationQueue *queue.NotificationQueue) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		notificationType := c.Params("type")
-		recipient := c.FormValue("recipient")
-		message := c.FormValue("message")
+
+		var payload NotificationPayload
+		if err := c.BodyParser(&payload); err != nil {
+			logrus.Fatalf("Error parsing request body: %v\n", err)
+			return c.Status(fiber.StatusBadRequest).SendString("Invalid request payload")
+		}
 
 		// Use the factory to create a notification instance
 		factory := &factories.NotificationFactory{}
@@ -31,8 +42,8 @@ func NotificationHandler(notificationQueue *queue.NotificationQueue) fiber.Handl
 		// Add the notification task to the queue with retry logic
 		notificationQueue.AddTask(queue.NotificationTask{
 			Notification: notification,
-			Recipient:    recipient,
-			Message:      message,
+			Recipient:    payload.Recipient,
+			Message:      payload.Message,
 			MaxRetries:   maxRetries,
 			RetryDelay:   retryDelay,
 		})

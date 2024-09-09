@@ -77,16 +77,16 @@ func (q *NotificationQueue) processTaskWithRetry(task NotificationTask) {
 	for {
 		err := task.Notification.Send(task.Recipient, task.Message)
 		if err != nil {
-			logrus.Errorf("Error sending notification: %v\n", err)
+			logrus.Errorf("Error sending notification: %v", err)
 			task.RetryCount++
 			if task.RetryCount > task.MaxRetries {
-				logrus.Fatalf("Max retries reached for recipient %s. Giving up.\n", task.Recipient)
+				logrus.Fatalf("Max retries reached for recipient %s. Giving up.", task.Recipient)
 				return
 			}
-			logrus.Infof("Retrying... (%d/%d)\n", task.RetryCount, task.MaxRetries)
+			logrus.Infof("Retrying... (%d/%d)", task.RetryCount, task.MaxRetries)
 			time.Sleep(task.RetryDelay)
 		} else {
-			logrus.Infof("Notification sent successfully to %s\n", task.Recipient)
+			logrus.Infof("Notification sent successfully to %s", task.Recipient)
 			return
 		}
 	}

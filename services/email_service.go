@@ -7,6 +7,6 @@ type EmailNotification struct{}
 
 // Send sends an email to the recipient.
 func (e *EmailNotification) Send(recipient string, message string) error {
-	logrus.Infof("Sending Email to %s: %s\n", recipient, message)
+	logrus.Infof("Sending Email to %s: %s", recipient, message)
 	return nil
 }

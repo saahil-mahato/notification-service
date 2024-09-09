@@ -9,6 +9,6 @@ type SMSNotification struct{}
 
 // Send sends an SMS to the recipient.
 func (s *SMSNotification) Send(recipient string, message string) error {
-	logrus.Infof("Sending SMS to %s: %s\n", recipient, message)
+	logrus.Infof("Sending SMS to %s: %s", recipient, message)
 	return nil
 }

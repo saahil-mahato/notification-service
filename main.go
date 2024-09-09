@@ -13,7 +13,7 @@ func main() {
 	app := fiber.New()
 
 	// Inititalize the notification queue
-	notificationQueue := queue.NewNotificationQueue(10, 30*time.Second)
+	notificationQueue := queue.NewNotificationQueue(1, 3*time.Second)
 
 	// Route to handle sending notifications
 	app.Post("/send/:type", handlers.NotificationHandler(notificationQueue))
