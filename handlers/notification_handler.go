@@ -4,6 +4,7 @@ import (
 	"log"
 	"notification-service/factories"
 	"notification-service/queue"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -23,11 +24,17 @@ func NotificationHandler(notificationQueue *queue.NotificationQueue) fiber.Handl
 			return c.Status(fiber.StatusBadRequest).SendString("Invalid notification type")
 		}
 
-		// Add the notification task to the queue
+		// Define the retry configuration
+		maxRetries := 3
+		retryDelay := 5 * time.Second
+
+		// Add the notification task to the queue with retry logic
 		notificationQueue.AddTask(queue.NotificationTask{
 			Notification: notification,
 			Recipient:    recipient,
 			Message:      message,
+			MaxRetries:   maxRetries,
+			RetryDelay:   retryDelay,
 		})
 
 		return c.SendString("Notification sent successfully")

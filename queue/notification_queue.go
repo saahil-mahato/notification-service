@@ -1,6 +1,7 @@
 package queue
 
 import (
+	"fmt"
 	"notification-service/services"
 	"sync"
 	"time"
@@ -19,6 +20,9 @@ type NotificationTask struct {
 	Notification services.Notification
 	Recipient    string
 	Message      string
+	MaxRetries   int
+	RetryDelay   time.Duration
+	RetryCount   int
 }
 
 // NewNotificationQueue creates a new NotificationQueue with the given rate limit and interval.
@@ -60,9 +64,29 @@ func (q *NotificationQueue) processTasks() {
 
 	for i := 0; i < limit; i++ {
 		task := q.queue[i]
-		go task.Notification.Send(task.Recipient, task.Message)
+		go q.processTaskWithRetry(task)
 	}
 
 	// Remove processed tasks from the queue
 	q.queue = q.queue[limit:]
+}
+
+// processTaskWithRetry processes a single notification task with retry logic.
+func (q *NotificationQueue) processTaskWithRetry(task NotificationTask) {
+	for {
+		err := task.Notification.Send(task.Recipient, task.Message)
+		if err != nil {
+			fmt.Printf("Error sending notification: %v\n", err)
+			task.RetryCount++
+			if task.RetryCount > task.MaxRetries {
+				fmt.Printf("Max retries reached for recipient %s. Giving up.\n", task.Recipient)
+				return
+			}
+			fmt.Printf("Retrying... (%d/%d)\n", task.RetryCount, task.MaxRetries)
+			time.Sleep(task.RetryDelay)
+		} else {
+			fmt.Printf("Notification sent successfully to %s\n", task.Recipient)
+			return
+		}
+	}
 }
