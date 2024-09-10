@@ -22,7 +22,7 @@ func NotificationHandler(notificationQueue *queue.NotificationQueue) fiber.Handl
 
 		var payload NotificationPayload
 		if err := c.BodyParser(&payload); err != nil {
-			logrus.Fatalf("Error parsing request body: %v\n", err)
+			logrus.Fatalf("Error parsing request body: %v", err)
 			return c.Status(fiber.StatusBadRequest).SendString("Invalid request payload")
 		}
 
@@ -30,7 +30,7 @@ func NotificationHandler(notificationQueue *queue.NotificationQueue) fiber.Handl
 		factory := &factories.NotificationFactory{}
 		notification, err := factory.CreateNotification(notificationType)
 		if err != nil {
-			logrus.Errorf("Error: %v\n", err)
+			logrus.Errorf("Error: %v", err)
 			return c.Status(fiber.StatusBadRequest).SendString("Invalid notification type")
 		}
 
