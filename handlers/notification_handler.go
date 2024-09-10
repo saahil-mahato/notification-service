@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"log"
 	"notification-service/factories"
 	"notification-service/queue"
 	"time"
@@ -31,7 +30,7 @@ func NotificationHandler(notificationQueue *queue.NotificationQueue) fiber.Handl
 		factory := &factories.NotificationFactory{}
 		notification, err := factory.CreateNotification(notificationType)
 		if err != nil {
-			log.Printf("Error: %v\n", err)
+			logrus.Errorf("Error: %v\n", err)
 			return c.Status(fiber.StatusBadRequest).SendString("Invalid notification type")
 		}
 
